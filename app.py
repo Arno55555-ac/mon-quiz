@@ -6,29 +6,29 @@ st.write("Choisis une réponse pour chaque question, puis clique sur « Voir mon
 # Liste des questions : la question, les choix possibles et la bonne réponse
 questions = [
     {
-        "question": "Quelle est la capitale de la France ?",
-        "choix": ["Lyon", "Paris", "Marseille"],
-        "reponse": "Paris",
+        "question": "Quelle destination pour les vacances d'octobre ?",
+        "choix": ["Les sables", "Les Canaries", "Rester à Igny"],
+        "reponse": "Les sables",
     },
     {
-        "question": "Combien font 5 x 3 ?",
-        "choix": ["8", "15", "53"],
-        "reponse": "15",
+        "question": "Combien de temps ?",
+        "choix": ["8 jours", "10 jours", "15 jours"],
+        "reponse": "8 jours",
     },
     {
-        "question": "Quel langage utilise Streamlit ?",
-        "choix": ["Python", "JavaScript", "PHP"],
-        "reponse": "Python",
+        "question": "Quel activités à faire ?",
+        "choix": ["Surf", "Musée", "Balade"],
+        "reponse": "Surf",
     },
     {
-        "question": "Quelle planète est la plus proche du Soleil ?",
-        "choix": ["Vénus", "Mars", "Mercure"],
-        "reponse": "Mercure",
+        "question": "Quelle jour partir ?",
+        "choix": ["Vendredi", "Samedi", "Dimanche"],
+        "reponse": "Vendredi",
     },
     {
-        "question": "Combien y a-t-il de jours dans une semaine ?",
-        "choix": ["5", "7", "10"],
-        "reponse": "7",
+        "question": "Prendre les combinaisons ?",
+        "choix": ["oui", "non", "à voir"],
+        "reponse": "oui",
     },
 ]
 
