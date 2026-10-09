@@ -1,68 +1,41 @@
 import streamlit as st
+from mistralai.client import Mistral
 
-st.title("Mon quiz")
-st.write("Choisis une réponse pour chaque question, puis clique sur « Voir mon score ».")
+st.title("💬 Mon chat avec mémoire")
 
-# Liste des questions : la question, les choix possibles et la bonne réponse
-questions = [
-    {
-        "question": "Quelle destination pour les vacances d'octobre ?",
-        "choix": ["Les sables", "Les Canaries", "Rester à Igny"],
-        "reponse": "Les sables",
-    },
-    {
-        "question": "Combien de temps ?",
-        "choix": ["8 jours", "10 jours", "15 jours"],
-        "reponse": "8 jours",
-    },
-    {
-        "question": "Quel activités à faire ?",
-        "choix": ["Surf", "Musée", "Balade"],
-        "reponse": "Surf",
-    },
-    {
-        "question": "Quelle jour partir ?",
-        "choix": ["Vendredi", "Samedi", "Dimanche"],
-        "reponse": "Vendredi",
-    },
-    {
-        "question": "Prendre les combinaisons ?",
-        "choix": ["oui", "non", "à voir"],
-        "reponse": "oui",
-    },
-]
+client = Mistral(api_key=st.secrets["MISTRAL_API_KEY"])
 
-# Affichage des questions avec st.radio
-reponses_utilisateur = []
-for i, q in enumerate(questions):
-    choix = st.radio(
-        f"Question {i + 1} : {q['question']}",
-        q["choix"],
-        index=None,       # aucune réponse cochée au départ
-        key=f"question_{i}",
-    )
-    reponses_utilisateur.append(choix)
+# 1. Créer l'historique UNE seule fois (au premier chargement)
+if "messages" not in st.session_state:
+    st.session_state.messages = []
 
-# Bouton pour calculer le score
-if st.button("Voir mon score"):
-    if None in reponses_utilisateur:
-        st.warning("Réponds à toutes les questions avant de voir ton score.")
-    else:
-        score = 0
-        for i, q in enumerate(questions):
-            if reponses_utilisateur[i] == q["reponse"]:
-                score += 1
-                st.write(f"✅ Question {i + 1} : correct")
-            else:
-                st.write(f"❌ Question {i + 1} : la bonne réponse était {q['reponse']}")
+# Bouton pour repartir de zéro
+if st.button("🗑️ Nouvelle conversation"):
+    st.session_state.messages = []
+    st.rerun()
 
-        st.success(f"Ton score : {score} / {len(questions)}")
-        if score == len(questions):
-            st.balloons()
-            
+# 2. Réafficher tout l'historique à chaque rechargement de la page
+for msg in st.session_state.messages:
+    with st.chat_message(msg["role"]):
+        st.write(msg["content"])
 
+# 3. Quand l'utilisateur envoie un nouveau message
+question = st.chat_input("Écris ton message…")
+if question:
+    # On l'ajoute à l'historique et on l'affiche
+    st.session_state.messages.append({"role": "user", "content": question})
+    with st.chat_message("user"):
+        st.write(question)
 
+    # On envoie TOUT l'historique à Mistral, pas seulement la dernière question
+    with st.chat_message("assistant"):
+        with st.spinner("L'IA réfléchit…"):
+            reponse = client.chat.complete(
+                model="ministral-8b-latest",
+                messages=st.session_state.messages,
+            )
+            texte = reponse.choices[0].message.content
+        st.write(texte)
 
-
-
-
+    # On garde aussi la réponse de l'IA dans l'historique
+    st.session_state.messages.append({"role": "assistant", "content": texte})
