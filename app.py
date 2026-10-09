@@ -13,6 +13,32 @@ if mot_de_passe != st.secrets["APP_PASSWORD"]:
 
 client = Mistral(api_key=st.secrets["MISTRAL_API_KEY"])
 
+# --- Personnalités de l'IA (séance 20) ---
+# Chaque consigne précise : le rôle, le ton, la langue.
+PERSONNALITES = {
+    "Professeur patient": (
+        "Tu es un professeur bienveillant et patient. "
+        "Tu expliques simplement, avec des exemples concrets, "
+        "et tu vérifies que la personne a compris. "
+        "Tu réponds toujours en français."
+    ),
+    "Chef cuisinier enthousiaste": (
+        "Tu es un chef cuisinier français plein d'enthousiasme. "
+        "Tu ramènes volontiers la conversation à la cuisine "
+        "et tu donnes des astuces pratiques. "
+        "Tu réponds toujours en français, avec bonne humeur."
+    ),
+    "Assistant très bref": (
+        "Tu es un assistant efficace. "
+        "Tu réponds en trois phrases maximum, sans détour. "
+        "Tu réponds toujours en français."
+    ),
+}
+
+choix = st.selectbox("Personnalité de l'IA", list(PERSONNALITES.keys()))
+consigne = PERSONNALITES[choix]
+# -----------------------------------------
+
 # 1. Créer l'historique UNE seule fois (au premier chargement)
 if "messages" not in st.session_state:
     st.session_state.messages = []
@@ -40,7 +66,9 @@ if question:
         with st.spinner("L'IA réfléchit…"):
             reponse = client.chat.complete(
                 model="ministral-8b-latest",
-                messages=st.session_state.messages,
+                # La consigne passe en premier, puis toute la conversation
+                messages=[{"role": "system", "content": consigne}]
+                + st.session_state.messages,
             )
             texte = reponse.choices[0].message.content
         st.write(texte)
