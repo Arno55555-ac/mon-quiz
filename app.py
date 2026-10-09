@@ -3,6 +3,14 @@ from mistralai.client import Mistral
 
 st.title("💬 Mon chat avec mémoire")
 
+# --- Protection par mot de passe (séance 19) ---
+mot_de_passe = st.text_input("Mot de passe", type="password")
+if mot_de_passe != st.secrets["APP_PASSWORD"]:
+    if mot_de_passe:  # on n'affiche l'erreur que si quelque chose a été tapé
+        st.error("Mot de passe incorrect")
+    st.stop()  # on arrête tout ici : le chat ne s'affiche pas
+# ------------------------------------------------
+
 client = Mistral(api_key=st.secrets["MISTRAL_API_KEY"])
 
 # 1. Créer l'historique UNE seule fois (au premier chargement)
